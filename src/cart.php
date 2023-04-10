@@ -1,220 +1,219 @@
-<?php require_once('header.php'); ?>
-
 <?php
-$statement = $pdo->prepare("SELECT * FROM tbl_settings WHERE id=1");
-$statement->execute();
-$result = $statement->fetchAll(PDO::FETCH_ASSOC);                            
-foreach ($result as $row) {
-    $banner_cart = $row['banner_cart'];
-}
+ob_start();
 ?>
-
 <?php
-$error_message = '';
-if(isset($_POST['form1'])) {
+ require "login.php";
+      if(!isset($_SESSION['txtus'])) // If session is not set then redirect to Login Page
+       {
+           header("Location:giohangchuacodnhap.php");  
+       }
 
-    $i = 0;
-    $statement = $pdo->prepare("SELECT * FROM tbl_product");
-    $statement->execute();
-    $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($result as $row) {
-        $i++;
-        $table_product_id[$i] = $row['p_id'];
-        $table_quantity[$i] = $row['p_qty'];
-    }
-
-    $i=0;
-    foreach($_POST['product_id'] as $val) {
-        $i++;
-        $arr1[$i] = $val;
-    }
-    $i=0;
-    foreach($_POST['quantity'] as $val) {
-        $i++;
-        $arr2[$i] = $val;
-    }
-    $i=0;
-    foreach($_POST['product_name'] as $val) {
-        $i++;
-        $arr3[$i] = $val;
-    }
-    
-    $allow_update = 1;
-    for($i=1;$i<=count($arr1);$i++) {
-        for($j=1;$j<=count($table_product_id);$j++) {
-            if($arr1[$i] == $table_product_id[$j]) {
-                $temp_index = $j;
-                break;
-            }
-        }
-        if($table_quantity[$temp_index] < $arr2[$i]) {
-        	$allow_update = 0;
-            $error_message .= '"'.$arr2[$i].'" items are not available for "'.$arr3[$i].'"\n';
-        } else {
-            $_SESSION['cart_p_qty'][$i] = $arr2[$i];
-        }
-    }
-    $error_message .= '\nOther items quantity are updated successfully!';
+?>
+<?php 
+	include "head.php"
+	?>
+<?php
+$title ="Shop huy";
+$name ="Điện thoai";
+?>
+<?php 
+	include "top.php"
     ?>
-    
-    <?php if($allow_update == 0): ?>
-    	<script>alert('<?php echo $error_message; ?>');</script>
-	<?php else: ?>
-		<script>alert('All Items Quantity Update is Successful!');</script>
-	<?php endif; ?>
-    <?php
-
-}
-?>
-
-<div class="page-banner" style="background-image: url(assets/uploads/<?php echo $banner_cart; ?>)">
-    <div class="overlay"></div>
-    <div class="page-banner-inner">
-        <h1><?php echo LANG_VALUE_18; ?></h1>
-    </div>
-</div>
-
-<div class="page">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-
-                <?php if(!isset($_SESSION['cart_p_id'])): ?>
-                    <?php echo '<h2 class="text-center">Cart is Empty!!</h2></br>'; ?>
-                    <?php echo '<h4 class="text-center">Add products to the cart in order to view it here.</h4>'; ?>
-                <?php else: ?>
-                <form action="" method="post">
-                    <?php $csrf->echoInputField(); ?>
-				<div class="cart">
-                    <table class="table table-responsive table-hover table-bordered">
-                        <tr>
-                            <th><?php echo '#' ?></th>
-                            <th><?php echo LANG_VALUE_8; ?></th>
-                            <th><?php echo LANG_VALUE_47; ?></th>
-                            <th><?php echo LANG_VALUE_157; ?></th>
-                            <th><?php echo LANG_VALUE_158; ?></th>
-                            <th><?php echo LANG_VALUE_159; ?></th>
-                            <th><?php echo LANG_VALUE_55; ?></th>
-                            <th class="text-right"><?php echo LANG_VALUE_82; ?></th>
-                            <th class="text-center" style="width: 100px;"><?php echo LANG_VALUE_83; ?></th>
-                        </tr>
-                        <?php
-                        $table_total_price = 0;
-
-                        $i=0;
-                        foreach($_SESSION['cart_p_id'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_p_id[$i] = $value;
-                        }
-
-                        $i=0;
-                        foreach($_SESSION['cart_size_id'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_size_id[$i] = $value;
-                        }
-
-                        $i=0;
-                        foreach($_SESSION['cart_size_name'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_size_name[$i] = $value;
-                        }
-
-                        $i=0;
-                        foreach($_SESSION['cart_color_id'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_color_id[$i] = $value;
-                        }
-
-                        $i=0;
-                        foreach($_SESSION['cart_color_name'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_color_name[$i] = $value;
-                        }
-
-                        $i=0;
-                        foreach($_SESSION['cart_p_qty'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_p_qty[$i] = $value;
-                        }
-
-                        $i=0;
-                        foreach($_SESSION['cart_p_current_price'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_p_current_price[$i] = $value;
-                        }
-
-                        $i=0;
-                        foreach($_SESSION['cart_p_name'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_p_name[$i] = $value;
-                        }
-
-                        $i=0;
-                        foreach($_SESSION['cart_p_featured_photo'] as $key => $value) 
-                        {
-                            $i++;
-                            $arr_cart_p_featured_photo[$i] = $value;
-                        }
-                        ?>
-                        <?php for($i=1;$i<=count($arr_cart_p_id);$i++): ?>
-                        <tr>
-                            <td><?php echo $i; ?></td>
-                            <td>
-                                <img src="assets/uploads/<?php echo $arr_cart_p_featured_photo[$i]; ?>" alt="">
-                            </td>
-                            <td><?php echo $arr_cart_p_name[$i]; ?></td>
-                            <td><?php echo $arr_cart_size_name[$i]; ?></td>
-                            <td><?php echo $arr_cart_color_name[$i]; ?></td>
-                            <td><?php echo LANG_VALUE_1; ?><?php echo $arr_cart_p_current_price[$i]; ?></td>
-                            <td>
-                                <input type="hidden" name="product_id[]" value="<?php echo $arr_cart_p_id[$i]; ?>">
-                                <input type="hidden" name="product_name[]" value="<?php echo $arr_cart_p_name[$i]; ?>">
-                                <input type="number" class="input-text qty text" step="1" min="1" max="" name="quantity[]" value="<?php echo $arr_cart_p_qty[$i]; ?>" title="Qty" size="4" pattern="[0-9]*" inputmode="numeric">
-                            </td>
-                            <td class="text-right">
-                                <?php
-                                $row_total_price = $arr_cart_p_current_price[$i]*$arr_cart_p_qty[$i];
-                                $table_total_price = $table_total_price + $row_total_price;
-                                ?>
-                                <?php echo LANG_VALUE_1; ?><?php echo $row_total_price; ?>
-                            </td>
-                            <td class="text-center">
-                                <a onclick="return confirmDelete();" href="cart-item-delete.php?id=<?php echo $arr_cart_p_id[$i]; ?>&size=<?php echo $arr_cart_size_id[$i]; ?>&color=<?php echo $arr_cart_color_id[$i]; ?>" class="trash"><i class="fa fa-trash" style="color:red;"></i></a>
-                            </td>
-                        </tr>
-                        <?php endfor; ?>
-                        <tr>
-                            <th colspan="7" class="total-text">Total</th>
-                            <th class="total-amount"><?php echo LANG_VALUE_1; ?><?php echo $table_total_price; ?></th>
-                            <th></th>
-                        </tr>
-                    </table> 
-                </div>
-
-                <div class="cart-buttons">
-                    <ul>
-                        <li><input type="submit" value="<?php echo LANG_VALUE_20; ?>" class="btn btn-primary" name="form1"></li>
-                        <li><a href="index.php" class="btn btn-primary"><?php echo LANG_VALUE_85; ?></a></li>
-                        <li><a href="checkout.php" class="btn btn-primary"><?php echo LANG_VALUE_23; ?></a></li>
-                    </ul>
-                </div>
-                </form>
-                <?php endif; ?>
-
-                
-
+    <?php 
+	include "header.php"
+	?>
+	<?php 
+	include "navigation.php"
+	?>
+	<!--//////////////////////////////////////////////////-->
+	<!--///////////////////Cart Page//////////////////////-->
+	<!--//////////////////////////////////////////////////-->
+	<?php 
+	if(is_countable($_SESSION['cart']) == 0)
+	{
+		header('Location: baogiohangtrong.php');
+	}
+	?>
+	<div id="page-content" class="single-page">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<ul class="breadcrumb">
+						<li><a href="index.php">Home</a></li>
+						<li><a href="cart.php">Giỏ hàng</a></li>
+					</ul>
+				</div>
 			</div>
-		</div>
+			<div class="cart">
+			<p><?php
+			$ok=1;
+			 if(isset($_SESSION['cart']))
+			 {
+				 foreach($_SESSION['cart'] as $key => $value)
+				 {
+					 if(isset($key))
+					 {
+						$ok=2;
+					 }
+				 }
+			 }
+			
+			 if($ok == 2)
+			 {
+				echo "Có ".count($_SESSION['cart']). " Có món đồ chơi trong giỏ hàng ";
+			 }
+			else
+			{
+				echo   "<p>Không có có món đồ chơi nào trong giỏ hàng</p>";
+			}
+			
+			$sl = count($_SESSION['cart']);
+			?>
+			</p>			
+			</div>
+			<?php
+
+			require "inc/myconnect.php";
+
+			if(isset($_SESSION['cart']))
+			{
+				foreach($_SESSION['cart'] as $key  => $value)
+				{
+					$item[]=$key;
+				}
+				// echo $item;
+				$str= implode(",",$item);
+			    $query = "SELECT s.ID,s.Ten,s.date,s.Gia,s.HinhAnh,s.KhuyenMai,s.giakhuyenmai,s.Mota, n.Ten as Tennhasx,s.Manhasx
+				from sanpham s 
+				LEFT JOIN nhaxuatban n on n.ID = s.Manhasx
+				 WHERE  s.id  in ($str)";
+				$result = $conn->query($query);
+				$total=0;
+				foreach($result as $s)
+				{
+			?>
+
+			<div class="row">
+			<form name="form5" id="ff5" method="POST" action="removecart.php">
+				<div class="product well">
+					<div class="col-md-3">
+						<div class="image">
+							<img src="images/<?php  echo $s["HinhAnh"]?>" style="width:300px;height:300px" />
+						</div>
+					</div>
+					<div class="col-md-9">
+						<div class="caption">
+							<div class="name"><h3><a href="product.php?id=<?php  echo $s["ID"]?>"><?php  echo $s["Ten"]?></a></h3></div>
+							<div class="info">	
+								<ul>
+									<li>Category: <?php  echo $s["Tennhasx"]?></li>
+								</ul>
+							</div>
+							<?php
+                                 if($s["KhuyenMai"] == true)
+								 {                                      
+								?>
+								<div class="price"><?php  echo $s["giakhuyenmai"]?>.000 VNĐ</div>
+								<?php 
+								}
+								?>
+								<?php
+                                 if($s["KhuyenMai"] == false)
+								 {
+								?>
+								<div class="price"><?php  echo $s["Gia"]?>.000 VNĐ</div>
+								<?php 
+								}
+								?>
+
+							<label>Số lượng: </label> 
+							<input class="form-inline quantity" style="margin-right: 80px;width:50px" min="1" max ="99" type="number" name ="qty[<?php echo $s["ID"] ?>]" value="<?php echo $_SESSION['cart'][$s["ID"]]?>"> 
+						     <div>
+								<input type="submit" name="update" style="margin-top:31px"  value="cập nhật Sách này" class="btn btn-2" />
+							</div>
+							<hr>
+							<input type="submit" name="remove" value="xóa Sách này" class="btn btn-default pull-right" />	
+							<input type="hidden" name="idsprm" value="<?php echo $s["ID"] ?>" />
+							<?php
+                                 if($s["KhuyenMai"] == true)
+								 {                                      
+								?>
+									<label style="color:red">Thành tiền: <?php ;
+							    echo  $_SESSION['cart'][$s["ID"]] * $s["giakhuyenmai"]?>.000  </label> 
+								<?php 
+								}
+								?>
+								<?php
+                                 if($s["KhuyenMai"] == false)
+								 {
+								?>
+									<label style="color:red">Thành tiền: <?php ;
+							    echo  $_SESSION['cart'][$s["ID"]] * $s["Gia"]?>.000  </label> 
+								<?php 
+								}
+								?>
+						
+						</div>
+					</div>
+
+					<div class="clear"></div>
+				</div>	
+			</form>
+			<?php
+                                 if($s["KhuyenMai"] == true)
+								 {                                      
+								?>
+											<?php 
+				              $total +=$_SESSION['cart'][$s["ID"]] * $s["giakhuyenmai"]?>
+								<?php 
+								}
+								?>
+								<?php
+                                 if($s["KhuyenMai"] == false)
+								 {
+								?>
+								<?php 
+				              $total +=$_SESSION['cart'][$s["ID"]] * $s["Gia"]?>
+								<?php 
+								}
+								?>
+		
+			</div>
+			<?php 
+				}
+			}
+			?>
+				
+			<div class="row">
+			<a href="rmcart.php" class="btn btn-2" style="margin-bottom:31px">Xóa hết giỏ hàng</a>
+				<div class="col-md-4 col-md-offset-8 ">
+					<center><a href="index.php" class="btn btn-1" style="margin-left:-76px">Chọn những món đồ chơi khác</a></center>
+				</div>
+			<div class="row">
+				<div class="pricedetails">
+					<div class="col-md-4 col-md-offset-8" >
+						<table style="margin-right:31px">
+							<h6>Price Details</h6>
+							<tr>
+								<td>Số lượng đồ chơi </td>
+								<td><?php echo $sl ?></td>
+							</tr>
+							<tr style="border-top: 1px solid #333">
+								<td><h5>Tổng cộng</h5></td>
+								<td><?php echo $total ?>.000</td>
+							</tr>
+						</table>
+						<center><a href="dathang.php" class="btn btn-1">Đặt hàng</a></center>
+					</div>
+				</div>
+			</div>
+		</div> 
+	</div>	
 	</div>
-</div>
+	<?php 
+	include "footer.php"
+	?>
+</body>
+</html>
+<?php ob_end_flush(); ?>
 
-
-<?php require_once('footer.php'); ?>
