@@ -2,7 +2,7 @@
 $currency 2 = '&#8377; '; //Currency Character or code 3 
 $db_username = 'dbcao';
 $db_password = 'dbCao@123';
-$db_name = 'ecommerceweb'; 
+$db_name = 'toy_store'; 
  $db_host = 'db';
  $shipping_cost = 1.50; //shipping cost 
  $taxes = array( 'VAT' => 12,
